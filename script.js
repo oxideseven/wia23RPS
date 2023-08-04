@@ -1,91 +1,105 @@
 //Global Game Variables
-const choices = [`rock`, `paper`, `scissors`];
+const choices = [`Rock`, `Paper`, `Scissors`];
 let aiSelection = undefined;
 let playerSelection = undefined;
 let playerScore = 0;
 let aiScore = 0;
 let currentRound = 0;
 
+const buttons = document.querySelectorAll('button');
+
+buttons.forEach((button) => {
+
+    button.addEventListener('click', () => {
+        console.log(button.id);
+        playRound(button.id);
+    });
+});
+
+const currentRoundText = document.getElementById("currentRound");
+const playerChoiceText = document.getElementById("playerChoice");
+const aiChoiceText = document.getElementById("aiChoice");  
+const roundResultText = document.getElementById("roundResults");
+const gameScoreText = document.getElementById("gameScore")
+const gameWinnerText = document.getElementById("gameResult");
+
 //AI makes a choice
 function getComputerChoice() {
+    aiChoiceText.innerHTML = `AI Choice: `;
     aiSelection = Math.floor(Math.random() * choices.length);
 }
 
 //Get the players selection
-function getPlayerChoice() {
-    let askPlayer = prompt(`Rock, Paper, or Scissors?`);
-    
-    switch (askPlayer.toLowerCase()) {
+function getPlayerChoice(buttonPressed) {
+    playerChoiceText.innerHTML = "Player Choice: ";    
+    switch (buttonPressed) {
         case `rock`:
             playerSelection = 0;
-            console.log(`You picked rock;`);
             break;
         case `paper`:
             playerSelection = 1;
-            console.log(`You picked paper;`);
             break;
         case `scissors`:
             playerSelection = 2;
-            console.log(`You picked scissors;`);
             break;
-        case null:
-            console.log(`You've canceled... You're no fun.`);
-            break;
-        default:
-            console.log(`Please try again`);
-            getPlayerChoice();
     }
 }
 
 //Figure out a winner
 function whoWon() {
+    roundResultText.innerHTML = `Round Winner: `;
+    console.log(`Player: ${playerScore} | AI ${aiScore}`)
     switch (true) {
         case (aiSelection === playerSelection):
-            console.log(`Round ${currentRound} is a draw!`);
+            roundResultText.innerHTML += `Draw`;
             break;
         case (aiSelection === 0 && playerSelection === 1) || (aiSelection === 1 && playerSelection === 2) || (aiSelection === 2 && playerSelection === 0):
-            console.log(`You win round ${currentRound}, human.`);
+            roundResultText.innerHTML += `Player`;
             ++playerScore;
             break;
         case (aiSelection === 0 && playerSelection === 2) || (aiSelection === 1 && playerSelection === 0) ||(aiSelection === 2 && playerSelection === 1):
-            console.log(`Behold meat vessel, my superior intelect has won me round ${currentRound}.`);
+            roundResultText.innerHTML += `AI`;
             ++aiScore;
             break;
     }
 }
 
 //Play a round
-function playRound() {
+function playRound(buttonPressed) {
     ++currentRound;
     getComputerChoice();
-    getPlayerChoice();
-    console.log(`I have selected ${choices[aiSelection]}.`);
+    getPlayerChoice(buttonPressed);
     whoWon();
+    updateText();
     isGameOver();
 };
 
+function updateText() {
+    currentRoundText.innerHTML = `Round: ${currentRound}`;
+    playerChoiceText.innerHTML += choices[playerSelection];
+    aiChoiceText.innerHTML += choices[aiSelection];
+    gameScoreText.innerHTML = `Player: ${playerScore} | AI: ${aiScore}`;
+}
+
 function isGameOver() {
-    if (currentRound == 5 && playerScore > aiScore) {
-        console.log(`You've won this game human. Perhaps you're actually an AI?. ${playerScore} to ${aiScore}`);
-        resetGame();
-    } else if (currentRound == 5 && playerScore < aiScore) {
-        console.log(`Flesh creature, it's over. I have won. ${aiScore} to ${playerScore}`);
-        resetGame();
-    } else if (currentRound == 5 && playerScore == aiScore) {
-        console.log(`We are evenly matched. There may be hope for you yet. ${aiScore} to ${playerScore}`);
-        resetGame();
+    gameWinnerText.innerHTML = `Game Winner: `;
+    if ((playerScore === 5) || (aiScore === 5)){
+        if (playerScore > aiScore) {
+            gameWinnerText.innerHTML += `Player`;
+            resetGame();
+        } else if (playerScore < aiScore) {
+            gameWinnerText.innerHTML += `AI`;
+            resetGame();
+        } else if (playerScore == aiScore) {
+            gameWinnerText.innerHTML += `Draw`;
+            resetGame();
+        }
     }
-    else {
-        playRound();
-    }
+    
 }
 
 function resetGame() {
     playerScore = 0;
     aiScore = 0;
     currentRound = 0;
-}
-
-function playGame() {
-    playRound();
 }
